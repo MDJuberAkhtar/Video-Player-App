@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 dotenv.config({ path: './config.env' });
 const userRouter = require('./routes/userRoutes');
 const videoRouter = require('./routes/videoRoutes');
@@ -35,6 +36,15 @@ app.use('/api/videos', express.static('media/uploads'));
 //routes
 app.use('/api/v1/users', userRouter);
 app.use('/api', videoRouter);
+
+if (process.env.NODE_ENV === 'production') {
+  // Set static folder
+  app.use(express.static('frontend/build'));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
+  });
+}
 
 
 //server
